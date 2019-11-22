@@ -1,42 +1,35 @@
 import { MarkerClusterIcon } from './clustericon';
-import {
-  CLASS_NAME_DEFAULT,
-  GRID_SIZE_DEFAULT,
-  MAX_ZOOM_DEFAULT,
-  MIN_CLUSTER_SIZE_DEFAULT,
-  PROP_HIDDEN,
-} from './constants';
+import { CLASS_NAME_DEFAULT, GRID_SIZE_DEFAULT, MAX_ZOOM_DEFAULT, MIN_CLUSTER_SIZE_DEFAULT } from './constants';
 import { ClustererHelper } from './helper';
 import { MarkerClusterer } from './index';
-import { IDimension } from './interfaces';
 
 export class MarkerCluster {
   private static counter = 0;
   private map: google.maps.Map | null = null;
   private center: google.maps.LatLng | null = null;
-  private features: google.maps.Data.Feature[] = [];
+  private markers: google.maps.Marker[] = [];
   private bounds: google.maps.LatLngBounds = new google.maps.LatLngBounds();
   private id: number;
-  private icon: FeatureClusterIcon | null;
+  private icon: MarkerClusterIcon | null;
 
   constructor(map: google.maps.Map, center: google.maps.LatLng) {
     this.map = map;
     this.center = center;
-    this.id = ++FeatureCluster.counter;
+    this.id = ++MarkerCluster.counter;
     this.calculateBounds_();
-    this.icon = new FeatureClusterIcon(map, this.id);
+    this.icon = new MarkerClusterIcon(map, this.id);
   }
 
   get classId(): string {
     return `${this.className}-${this.id}`;
   }
 
-  get clusterer(): DataLayerClusterer | undefined {
+  get clusterer(): MarkerClusterer | undefined {
     return (this.map && ClustererHelper.getClusterer(this.map)) ?? undefined;
   }
 
   get size(): number {
-    return this.features.length;
+    return this.markers.length;
   }
 
   get minClusterSize(): number {
@@ -64,39 +57,38 @@ export class MarkerCluster {
     if (this.center) {
       bounds.extend(this.center);
     }
-    for (const feature of this.features) {
-      bounds.union(ClustererHelper.featureBounds(feature));
+    for (const marker of this.markers) {
+      const pos = marker.getPosition();
+      if (pos) {
+        bounds.extend(pos);
+      }
     }
     return bounds;
   }
 
-  public isFeatureInClusterBounds(feature: google.maps.Data.Feature): boolean {
-    return this.bounds?.contains(ClustererHelper.featureCenter(feature));
+  public isMarkerInClusterBounds(marker: google.maps.Marker): boolean {
+    const pos = marker.getPosition();
+    if (pos) {
+      return this.bounds?.contains(pos);
+    }
+    return false;
   }
 
-  public addFeature(feature: google.maps.Data.Feature): boolean {
-    if (this.isFeatureAlreadyAdded_(feature)) {
+  public addMarker(marker: google.maps.Marker): boolean {
+    if (this.isFeatureAlreadyAdded_(marker)) {
       return false;
     }
-
-    if (
-      (feature.getGeometry().getType() !== 'Point' && !this.excludeFeatureBySize_(feature)) ||
-      feature.getGeometry().getType() === 'Point'
-    ) {
-      feature.setProperty('clusterID', this.classId);
-      this.features.push(feature);
-      this.updateClusterCenter_(feature);
-      if (this.features.length < this.minClusterSize) {
-        this.hideInCluster_(feature);
-      } else if (this.features.length === this.minClusterSize) {
-        for (const f of this.features) {
-          this.showInCluster_(f);
-        }
-      } else {
-        this.showInCluster_(feature);
+    marker.set('clusterID', this.classId);
+    this.markers.push(marker);
+    this.updateClusterCenter_(marker);
+    if (this.markers.length < this.minClusterSize) {
+      this.hideInCluster_(marker);
+    } else if (this.markers.length === this.minClusterSize) {
+      for (const m of this.markers) {
+        this.showInCluster_(m);
       }
     } else {
-      this.hideInCluster_(feature);
+      this.showInCluster_(marker);
     }
     this.updateIcon();
     return true;
@@ -105,8 +97,8 @@ export class MarkerCluster {
   public remove(): void {
     this.icon?.remove();
     this.icon = null;
-    this.features = [];
-    delete this.features;
+    this.markers = [];
+    delete this.markers;
     this.map = null;
     this.center = null;
   }
@@ -116,8 +108,8 @@ export class MarkerCluster {
     const mz = this.clusterer?.maxZoom ?? MAX_ZOOM_DEFAULT;
     if (mz && zoom > mz) {
       // The zoom is greater than our max zoom so show all the features of cluster.
-      for (const f of this.features) {
-        this.hideInCluster_(f);
+      for (const m of this.markers) {
+        this.hideInCluster_(m);
       }
       return;
     }
@@ -127,7 +119,7 @@ export class MarkerCluster {
       return;
     }
     const numStyles = this.clusterer?.styles.length ?? 0;
-    const sums = this.clusterer?.calculator(this.features, numStyles);
+    const sums = this.clusterer?.calculator(this.markers, numStyles);
 
     if (sums) {
       this.icon?.setSums(sums);
@@ -142,32 +134,31 @@ export class MarkerCluster {
     return this.id;
   }
 
-  private isFeatureAlreadyAdded_(feature: google.maps.Data.Feature) {
-    return this.features.indexOf(feature) !== -1;
+  private isFeatureAlreadyAdded_(marker: google.maps.Marker) {
+    return this.markers.indexOf(marker) !== -1;
   }
 
-  private hideInCluster_(feature: google.maps.Data.Feature): void {
-    if (feature.getProperty(PROP_HIDDEN)) {
-      this.clusterer?.removeFeatureAndAlternativeFromDataLayer(feature);
+  private hideInCluster_(marker: google.maps.Marker): void {
+    if (!marker.getVisible()) {
+      marker.setMap(null);
     } else {
-      this.clusterer?.addFeatureOrAlternativeToDataLayer(feature);
+      marker.setMap(this.map);
     }
   }
 
-  private showInCluster_(feature: google.maps.Data.Feature): void {
-    this.clusterer?.removeFeatureAndAlternativeFromDataLayer(feature);
+  private showInCluster_(marker: google.maps.Marker): void {
+    marker.setMap(null);
   }
 
-  private updateClusterCenter_(feature: google.maps.Data.Feature): void {
-    const centerPoint = ClustererHelper.featureCenter(feature);
+  private updateClusterCenter_(marker: google.maps.Marker): void {
     if (!this.center) {
-      this.center = centerPoint;
+      this.center = marker.getPosition() ?? null;
       this.calculateBounds_();
     } else {
       if (this.isAverageCenter) {
-        const l = this.features.length + 1;
-        const lat = (this.center.lat() * (l - 1) + centerPoint.lat()) / l;
-        const lng = (this.center.lng() * (l - 1) + centerPoint.lng()) / l;
+        const l = this.markers.length + 1;
+        const lat = (this.center.lat() * (l - 1) + (marker.getPosition()?.lat() ?? this.center.lat())) / l;
+        const lng = (this.center.lng() * (l - 1) + (marker.getPosition()?.lng() ?? this.center.lng())) / l;
         this.center = new google.maps.LatLng(lat, lng);
         this.calculateBounds_();
       }
@@ -180,10 +171,5 @@ export class MarkerCluster {
       mBounds.extend(this.center);
     }
     this.bounds = this.clusterer?.getExtendedBounds(mBounds) ?? mBounds;
-  }
-
-  private excludeFeatureBySize_(feature: google.maps.Data.Feature): boolean {
-    const dim: IDimension = this.clusterer?.getFeatureDimensions(feature) ?? { xsize: 0, ysize: 0 };
-    return Math.abs(dim.xsize) >= this.gridSize || Math.abs(dim.ysize) >= this.gridSize;
   }
 }

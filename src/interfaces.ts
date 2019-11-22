@@ -12,8 +12,3 @@ export interface IStyle {
   textSize?: number;
   backgroundPosition?: string;
 }
-
-export interface IDimension {
-  xsize: number;
-  ysize: number;
-}

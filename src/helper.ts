@@ -4,8 +4,9 @@ const instances: WeakMap<google.maps.Map, MarkerClusterer> = new WeakMap();
 
 export class ClustererHelper {
   public static isMarkerInBounds(marker: google.maps.Marker, bounds: google.maps.LatLngBounds): boolean {
-    if (bounds && marker.getPosition()) {
-      return bounds.contains(marker.getPosition());
+    const pos = marker.getPosition();
+    if (bounds && pos) {
+      return bounds.contains(pos);
     }
     return false;
   }

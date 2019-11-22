@@ -157,7 +157,7 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     return `${this.className}-${this.id}`;
   }
 
-  get clusterer(): DataLayerClusterer | undefined {
+  get clusterer(): MarkerClusterer | undefined {
     return (this.map && ClustererHelper.getClusterer(this.map)) ?? undefined;
   }
 

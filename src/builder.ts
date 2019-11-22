@@ -7,7 +7,7 @@ import {
   MIN_CLUSTER_SIZE_DEFAULT,
 } from './constants';
 import { ClustererHelper } from './helper';
-import { DataLayerClusterer } from './index';
+import { MarkerClusterer } from './index';
 import { IStyle } from './interfaces';
 
 export class Builder {
@@ -71,8 +71,8 @@ export class Builder {
     return this;
   }
 
-  public build(): DataLayerClusterer {
-    const clusterer = new DataLayerClusterer(this);
+  public build(): MarkerClusterer {
+    const clusterer = new MarkerClusterer(this);
     ClustererHelper.setClusterer(this.pMap, clusterer);
     return clusterer;
   }
