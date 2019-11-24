@@ -1,3 +1,4 @@
+import { MarkerClusterer } from './clusterer';
 import {
   CLASS_NAME_DEFAULT,
   GRID_SIZE_DEFAULT,
@@ -7,7 +8,6 @@ import {
   MIN_CLUSTER_SIZE_DEFAULT,
 } from './constants';
 import { ClustererHelper } from './helper';
-import { MarkerClusterer } from './index';
 import { IStyle } from './interfaces';
 
 export class Builder {

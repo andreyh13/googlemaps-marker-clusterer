@@ -1,4 +1,4 @@
-import { MarkerClusterer } from './index';
+import { MarkerClusterer } from './clusterer';
 
 const instances: WeakMap<google.maps.Map, MarkerClusterer> = new WeakMap();
 

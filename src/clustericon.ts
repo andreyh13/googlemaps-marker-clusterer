@@ -1,6 +1,6 @@
+import { MarkerClusterer } from './clusterer';
 import { CLASS_NAME_DEFAULT } from './constants';
 import { ClustererHelper } from './helper';
-import { MarkerClusterer } from './index';
 import { IStyle, ISums } from './interfaces';
 
 export class MarkerClusterIcon extends google.maps.OverlayView {

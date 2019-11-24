@@ -1,7 +1,7 @@
+import { MarkerClusterer } from './clusterer';
 import { MarkerClusterIcon } from './clustericon';
 import { CLASS_NAME_DEFAULT, GRID_SIZE_DEFAULT, MAX_ZOOM_DEFAULT, MIN_CLUSTER_SIZE_DEFAULT } from './constants';
 import { ClustererHelper } from './helper';
-import { MarkerClusterer } from './index';
 
 export class MarkerCluster {
   private static counter = 0;
