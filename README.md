@@ -124,6 +124,8 @@ In order to add markers to the clusterer you should use `createMarker()` method.
 
 The live demo is available at [https://maps-tools-242a6.firebaseapp.com/clusterer/demos/markerclusterer.html](https://maps-tools-242a6.firebaseapp.com/clusterer/demos/markerclusterer.html)
 
+AngularJS example is available at [Plunker](http://next.plnkr.co/edit/jw6Bkvt0pPkq0E4z)
+
 ## Licence
 
 The source code of this library is licensed under the MIT License.
