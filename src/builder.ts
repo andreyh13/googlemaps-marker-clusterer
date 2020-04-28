@@ -21,6 +21,8 @@ export class Builder {
   private pImageExtension: string = MARKER_CLUSTER_IMAGE_EXTENSION;
   private pZoomOnClick: boolean = true;
   private pAverageCenter: boolean = true;
+  private pGridBasedStrategy: boolean = false;
+  private pGridGlobal: boolean = false;
 
   constructor(map: google.maps.Map) {
     this.pMap = map;
@@ -71,6 +73,16 @@ export class Builder {
     return this;
   }
 
+  public withGridBasedStrategy(gridBased: boolean): Builder {
+    this.pGridBasedStrategy = gridBased;
+    return this;
+  }
+
+  public withGridGlobal(gridGlobal: boolean): Builder {
+    this.pGridGlobal = gridGlobal;
+    return this;
+  }
+
   public build(): MarkerClusterer {
     const clusterer = new MarkerClusterer(this);
     ClustererHelper.setClusterer(this.pMap, clusterer);
@@ -115,5 +127,13 @@ export class Builder {
 
   get averageCenter() {
     return this.pAverageCenter ?? true;
+  }
+
+  get gridBasedStrategy() {
+    return this.pGridBasedStrategy ?? false;
+  }
+
+  get gridGlobal() {
+    return this.pGridGlobal ?? false;
   }
 }

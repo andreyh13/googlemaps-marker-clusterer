@@ -26,6 +26,8 @@ export class MarkerClusterer extends google.maps.OverlayView {
   private pChanges: number = 0;
   private pReadyForFiltering = false;
   private pCalculator: (markers: google.maps.Marker[], numStyles: number) => ISums;
+  private pGridBasedStrategy: boolean = false;
+  private pGridGlobal: boolean = false;
 
   constructor(build: Builder) {
     super();
@@ -39,6 +41,8 @@ export class MarkerClusterer extends google.maps.OverlayView {
     this.pImageExtension = build.imageExtension;
     this.pZoomOnClick = build.zoomOnClick;
     this.pAverageCenter = build.averageCenter;
+    this.pGridBasedStrategy = build.gridBasedStrategy;
+    this.pGridGlobal = build.gridGlobal;
     this.pCalculator = this.calculator_;
     this.init_();
   }
@@ -369,6 +373,14 @@ export class MarkerClusterer extends google.maps.OverlayView {
   }
 
   private createClusters_(): void {
+    if (this.pGridBasedStrategy) {
+      this.gridBasedClustering_();
+    } else {
+      this.fastAlgorithmClustering_();
+    }
+  }
+
+  private fastAlgorithmClustering_(): void {
     if (!this.pReady || !this.getMap()) {
       return;
     }
@@ -422,6 +434,70 @@ export class MarkerClusterer extends google.maps.OverlayView {
               newCluster.addMarker(marker);
               this.pClusters.push(newCluster);
               workingClusterList.push(newCluster);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private gridBasedClustering_(): void {
+    if (!this.pReady || !this.getMap()) {
+      return;
+    }
+
+    const map: google.maps.Map = this.getMap() as google.maps.Map;
+    const mapBounds = map.getBounds() ?? new google.maps.LatLngBounds();
+    if (mapBounds) {
+      const extendedBounds = this.getExtendedBounds(mapBounds);
+      const projection = this.getProjection();
+      let northEast;
+      let southWest;
+      if (this.pGridGlobal) {
+        northEast = new google.maps.LatLng(85, 175);
+        southWest = new google.maps.LatLng(-85, -175);
+      } else {
+        northEast = mapBounds.getNorthEast();
+        southWest = mapBounds.getSouthWest();
+      }
+      const tr = projection.fromLatLngToDivPixel(northEast);
+      const bl = projection.fromLatLngToDivPixel(southWest);
+      if (tr.x < 0) tr.x = -tr.x;
+      if (bl.x > 0) bl.x = -bl.x;
+      let x = bl.x;
+      let y = tr.y;
+      while (x < tr.x) {
+        while (y < bl.y) {
+          const center = projection.fromDivPixelToLatLng(
+              new google.maps.Point(x + this.gridSize, y + this.gridSize)
+          );
+          if (extendedBounds.contains(center)) {
+            this.clusters.push(new MarkerCluster(this.map, center));
+          }
+          y += 2 * this.gridSize;
+        }
+        y = tr.y;
+        x += 2 * this.gridSize;
+      }
+
+      const firstIndex = this.indexLowerBoundLng_(extendedBounds.getSouthWest().lng());
+      for (let i = firstIndex, l = this.markers.length; i < l; ++i) {
+        const marker = this.markers[i];
+        if ((marker.getPosition()?.lng() ?? 0) > extendedBounds.getNorthEast().lng()) {
+          break;
+        }
+        if (
+          (marker.getPosition()?.lat() ?? 0) > extendedBounds.getSouthWest().lat() &&
+          (marker.getPosition()?.lat() ?? 0) < extendedBounds.getNorthEast().lat()
+        ) {
+          if (!marker.getVisible()) {
+            marker.setMap(null);
+          } else {
+            const found = this.clusters.find(cluster =>
+              cluster.isMarkerInClusterBounds(marker)
+            );
+            if (found) {
+              found.addMarker(marker);
             }
           }
         }
