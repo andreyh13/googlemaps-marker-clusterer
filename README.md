@@ -84,6 +84,8 @@ In order to create instance of clusterer you must call Builder, the Builder acce
 
     withAverageCenter(averageCenter: boolean)
 
+    withGridBasedStrategy(gridBased: boolean)
+
 #### Interface IStyle
 
 This interface is used to style the cluster's icons. There is default implementation of styles, but you can override it applying array of styles in Builder object
