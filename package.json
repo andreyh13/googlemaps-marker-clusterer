@@ -1,5 +1,5 @@
 {
-  "name": "@andreyh13/googlemaps-marker-clusterer",
+  "name": "googlemaps-points-clusterer",
   "version": "1.0.1",
   "description": "Clusterer library for Google Maps JavaScript API v3 markers",
   "main": "lib/index.js",

@@ -1,6 +1,6 @@
 # Marker Clusterer for Google Maps JavaScript API v3
 
-[![npm version](http://img.shields.io/npm/v/@andreyh13/googlemaps-marker-clusterer.svg?style=flat)](https://npmjs.org/package/@andreyh13/googlemaps-marker-clusterer "View this project on npm") ![GitHub release (latest by date)](https://img.shields.io/github/v/release/andreyh13/googlemaps-marker-clusterer) ![license](https://img.shields.io/github/license/andreyh13/googlemaps-marker-clusterer)
+[![npm version](http://img.shields.io/npm/v/googlemaps-points-clusterer.svg?style=flat)](https://npmjs.org/package/googlemaps-points-clusterer "View this project on npm") ![GitHub release (latest by date)](https://img.shields.io/github/v/release/andreyh13/googlemaps-marker-clusterer) ![license](https://img.shields.io/github/license/andreyh13/googlemaps-marker-clusterer)
 
 This is fast marker clustering library. It's working with Google Maps JavaScript API v3 as an alternative to [markerclusterer](https://github.com/googlemaps/v3-utility-library/tree/master/packages/markerclusterer) and [markerclustererplus](https://github.com/googlemaps/v3-utility-library/tree/master/packages/markerclustererplus) libraries from the googlemaps/v3-utility-library package.
 
