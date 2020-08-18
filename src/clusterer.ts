@@ -106,7 +106,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
 
   get numMarkers(): number {
     // Returns number of not hidden markers
-    const availableMarkers = this.markers.filter(marker => marker.getVisible());
+    const availableMarkers = this.markers.filter((marker) => marker.getVisible());
     return availableMarkers.length;
   }
 
@@ -282,7 +282,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
   }
 
   /* eslint-disable */
-  public draw(): void { }
+  public draw(): void {}
   /* eslint-enable */
 
   /* ---- Builder pattern implementation ---- */
@@ -311,19 +311,8 @@ export class MarkerClusterer extends google.maps.OverlayView {
   private sortClusters_(): void {
     for (let i = 1, j: number, tmp: MarkerCluster, tmpLng: number, length = this.pClusters.length; i < length; ++i) {
       tmp = this.pClusters[i];
-      tmpLng = tmp
-        .getBounds()
-        .getCenter()
-        .lng();
-      for (
-        j = i - 1;
-        j >= 0 &&
-        this.pClusters[j]
-          .getBounds()
-          .getCenter()
-          .lng() > tmpLng;
-        --j
-      ) {
+      tmpLng = tmp.getBounds().getCenter().lng();
+      for (j = i - 1; j >= 0 && this.pClusters[j].getBounds().getCenter().lng() > tmpLng; --j) {
         this.pClusters[j + 1] = this.pClusters[j];
       }
       this.pClusters[j + 1] = tmp;
@@ -468,9 +457,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
       let y = tr.y;
       while (x < tr.x) {
         while (y < bl.y) {
-          const center = projection.fromDivPixelToLatLng(
-            new google.maps.Point(x + this.gridSize, y + this.gridSize)
-          );
+          const center = projection.fromDivPixelToLatLng(new google.maps.Point(x + this.gridSize, y + this.gridSize));
           if (extendedBounds.contains(center)) {
             this.clusters.push(new MarkerCluster(this.map, center));
           }
@@ -493,9 +480,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
           if (!marker.getVisible()) {
             marker.setMap(null);
           } else {
-            const found = this.clusters.find(cluster =>
-              cluster.isMarkerInClusterBounds(marker)
-            );
+            const found = this.clusters.find((cluster) => cluster.isMarkerInClusterBounds(marker));
             if (found) {
               found.addMarker(marker);
             }
@@ -525,7 +510,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     SIZES.forEach((size, i) => {
       this.pStyles.push({
         height: size,
-        url: `${this.pImagePath}${(i + 1)}.${this.pImageExtension}`,
+        url: `${this.pImagePath}${i + 1}.${this.pImageExtension}`,
         width: size,
       });
     });
