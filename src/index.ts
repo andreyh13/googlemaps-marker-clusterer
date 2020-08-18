@@ -1,11 +1,12 @@
 export class Loader {
-  public static async getClusterer() {
+  public static async getClusterer(): Promise<any> {
     if (google && google.maps && google.maps.OverlayView) {
-      const MarkerClusterer = await import('./clusterer');
-      return MarkerClusterer.MarkerClusterer;
+      const module = await import('./clusterer');
+      return module.MarkerClusterer;
     } else {
-      // tslint:disable-next-line: no-console
+      /* eslint-disable */
       console.error('Google Maps JavaScript API v3 is not loaded. Cannot initialize MarkerClusterer.');
+      /* eslint-enable */
       return undefined;
     }
   }

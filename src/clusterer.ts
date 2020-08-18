@@ -17,17 +17,17 @@ export class MarkerClusterer extends google.maps.OverlayView {
   private pAverageCenter: boolean;
   private pMarkers: google.maps.Marker[] = [];
   private pClusters: MarkerCluster[] = [];
-  private pReady: boolean = false;
-  private pPrevZoom: number = 1;
+  private pReady = false;
+  private pPrevZoom = 1;
   private pZoomChangedListener: google.maps.MapsEventListener | null = null;
   private pIdleListener: google.maps.MapsEventListener | null = null;
-  private pFirstIdle: boolean = true;
-  private pTilesReady: boolean = false;
-  private pChanges: number = 0;
+  private pFirstIdle = true;
+  private pTilesReady = false;
+  private pChanges = 0;
   private pReadyForFiltering = false;
   private pCalculator: (markers: google.maps.Marker[], numStyles: number) => ISums;
-  private pGridBasedStrategy: boolean = false;
-  private pGridGlobal: boolean = false;
+  private pGridBasedStrategy = false;
+  private pGridGlobal = false;
 
   constructor(build: Builder) {
     super();
@@ -43,32 +43,32 @@ export class MarkerClusterer extends google.maps.OverlayView {
     this.pAverageCenter = build.averageCenter;
     this.pGridBasedStrategy = build.gridBasedStrategy;
     this.pGridGlobal = build.gridGlobal;
-    this.pCalculator = this.calculator_;
-    this.init_();
+    this.pCalculator = this.calculatorDef.bind(this);
+    this.init();
   }
 
   /* ---- Getters ---- */
-  get map() {
+  get map(): google.maps.Map {
     return this.pMap;
   }
 
-  get gridSize() {
+  get gridSize(): number {
     return this.pGridSize;
   }
 
-  get minClusterSize() {
+  get minClusterSize(): number {
     return this.pMinClusterSize;
   }
 
-  get maxZoom() {
+  get maxZoom(): number {
     return this.pMaxZoom;
   }
 
-  get className() {
+  get className(): string {
     return this.pClassName;
   }
 
-  get styles() {
+  get styles(): IStyle[] {
     return this.pStyles;
   }
 
@@ -76,50 +76,50 @@ export class MarkerClusterer extends google.maps.OverlayView {
     this.pStyles = styles;
   }
 
-  get calculator() {
+  get calculator(): (markers: google.maps.Marker[], numStyles: number) => ISums {
     return this.pCalculator;
   }
 
-  set calculator(calc) {
+  set calculator(calc: (markers: google.maps.Marker[], numStyles: number) => ISums) {
     this.pCalculator = calc;
   }
 
-  get imagePath() {
+  get imagePath(): string {
     return this.pImagePath;
   }
 
-  get imageExtension() {
+  get imageExtension(): string {
     return this.pImageExtension;
   }
 
-  get isZoomOnClick() {
+  get isZoomOnClick(): boolean {
     return this.pZoomOnClick;
   }
 
-  get isAverageCenter() {
+  get isAverageCenter(): boolean {
     return this.pAverageCenter;
   }
 
-  get clusters() {
+  get clusters(): MarkerCluster[] {
     return this.pClusters;
   }
 
-  get numMarkers() {
+  get numMarkers(): number {
     // Returns number of not hidden markers
     const availableMarkers = this.markers.filter(marker => marker.getVisible());
     return availableMarkers.length;
   }
 
-  get hasMarkers() {
+  get hasMarkers(): boolean {
     // Returns true if there is at least one not hidden marker
     return this.numMarkers > 0;
   }
 
-  get markers() {
+  get markers(): google.maps.Marker[] {
     // Returns sorted collection of all markers
     if (this.pChanges) {
-      if (this.shouldUseInsertionSort_()) {
-        this.sortMarkers_();
+      if (this.shouldUseInsertionSort()) {
+        this.sortMarkers();
       } else {
         this.pMarkers.sort((a, b) => (a.getPosition()?.lng() ?? 0) - (b.getPosition()?.lng() ?? 0));
       }
@@ -128,15 +128,15 @@ export class MarkerClusterer extends google.maps.OverlayView {
     return this.pMarkers;
   }
 
-  get readyForFiltering() {
+  get readyForFiltering(): boolean {
     return this.pReadyForFiltering;
   }
 
   /* ---- Public methods ---- */
   public setVisible(v: boolean): void {
     if (!v) {
-      this.removeEventListeners_();
-      this.resetViewport_();
+      this.removeEventListeners();
+      this.resetViewport();
       this.setMap(null);
     } else {
       this.setMap(this.pMap);
@@ -204,7 +204,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     this.clusters.length = 0;
 
     if (this.hasMarkers) {
-      this.createClusters_();
+      this.createClusters();
     } else {
       for (const marker of this.markers) {
         marker.setMap(null);
@@ -222,8 +222,8 @@ export class MarkerClusterer extends google.maps.OverlayView {
   }
 
   public destroy(): void {
-    this.resetViewport_();
-    this.removeEventListeners_();
+    this.resetViewport();
+    this.removeEventListeners();
     for (const marker of this.markers) {
       marker.setMap(null);
     }
@@ -243,7 +243,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
 
   public clearMarkers(): void {
     this.pMarkers = [];
-    this.resetViewport_();
+    this.resetViewport();
     this.redraw();
   }
 
@@ -260,7 +260,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
         const zoom = this.pMap.getZoom();
         if (this.pPrevZoom !== zoom) {
           this.pPrevZoom = zoom;
-          this.resetViewport_();
+          this.resetViewport();
         }
       });
     }
@@ -273,35 +273,35 @@ export class MarkerClusterer extends google.maps.OverlayView {
         }
       });
     }
-    this.setReady_(true);
+    this.setReady(true);
   }
 
   public onRemove(): void {
-    this.removeEventListeners_();
-    this.setReady_(false);
+    this.removeEventListeners();
+    this.setReady(false);
   }
 
-  /* tslint:disable*/
-  public draw(): void {}
-  /* tslint:enable*/
+  /* eslint-disable */
+  public draw(): void { }
+  /* eslint-enable */
 
   /* ---- Builder pattern implementation ---- */
   public static get Builder(): typeof Builder {
     return Builder;
   }
 
-  private resetViewport_(): void {
+  private resetViewport(): void {
     for (const cluster of this.pClusters) {
       cluster.remove();
     }
     this.pClusters = [];
   }
 
-  private setReady_(ready: boolean): void {
+  private setReady(ready: boolean): void {
     this.pReady = ready;
     if (ready) {
       if (this.hasMarkers && this.pFirstIdle && this.pTilesReady) {
-        this.createClusters_();
+        this.createClusters();
         this.pFirstIdle = false;
         this.pReadyForFiltering = true;
       }
@@ -330,7 +330,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     }
   }
 
-  private sortMarkers_(): void {
+  private sortMarkers(): void {
     for (
       let i = 1, j: number, tmp: google.maps.Marker, tmpLng: number, length = this.pMarkers.length;
       i < length;
@@ -345,7 +345,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     }
   }
 
-  private shouldUseInsertionSort_(): boolean {
+  private shouldUseInsertionSort(): boolean {
     if (this.pChanges > 300 || !this.pMarkers.length) {
       return false;
     } else {
@@ -353,11 +353,11 @@ export class MarkerClusterer extends google.maps.OverlayView {
     }
   }
 
-  private indexLowerBoundLng_(lng: number): number {
+  private indexLowerBoundLng(lng: number): number {
     // It's a binary search algorithm
     let it: number;
     let step: number;
-    let first: number = 0;
+    let first = 0;
     let count = this.markers.length;
     while (count > 0) {
       step = Math.floor(count / 2);
@@ -372,15 +372,15 @@ export class MarkerClusterer extends google.maps.OverlayView {
     return first;
   }
 
-  private createClusters_(): void {
+  private createClusters(): void {
     if (this.pGridBasedStrategy) {
-      this.gridBasedClustering_();
+      this.gridBasedClustering();
     } else {
-      this.fastAlgorithmClustering_();
+      this.fastAlgorithmClustering();
     }
   }
 
-  private fastAlgorithmClustering_(): void {
+  private fastAlgorithmClustering(): void {
     if (!this.pReady || !this.getMap()) {
       return;
     }
@@ -389,7 +389,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     const mapBounds = map.getBounds() ?? new google.maps.LatLngBounds();
     const extendedBounds = this.getExtendedBounds(mapBounds);
     // Binary search for the first interesting feature
-    const firstIndex = this.indexLowerBoundLng_(extendedBounds.getSouthWest().lng());
+    const firstIndex = this.indexLowerBoundLng(extendedBounds.getSouthWest().lng());
     const workingClusterList = this.pClusters.slice(0);
     for (let i = firstIndex, l = this.markers.length; i < l; ++i) {
       const marker = this.markers[i];
@@ -403,7 +403,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
         if (!marker.getVisible()) {
           marker.setMap(null);
         } else {
-          let clusterFound = false;
+          let isClusterFound = false;
           let cluster: MarkerCluster;
           for (let j = 0, ll = workingClusterList.length; j < ll; ++j) {
             cluster = workingClusterList[j];
@@ -420,14 +420,14 @@ export class MarkerClusterer extends google.maps.OverlayView {
 
             if (cluster.isMarkerInClusterBounds(marker)) {
               cluster.addMarker(marker);
-              clusterFound = true;
+              isClusterFound = true;
               break;
             }
           }
 
           // If the feature doesn't fit in any cluster,
           // we must create a brand new cluster.
-          if (!clusterFound) {
+          if (!isClusterFound) {
             const pos = marker.getPosition();
             if (pos) {
               const newCluster = new MarkerCluster(this.pMap, pos);
@@ -441,7 +441,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     }
   }
 
-  private gridBasedClustering_(): void {
+  private gridBasedClustering(): void {
     if (!this.pReady || !this.getMap()) {
       return;
     }
@@ -469,7 +469,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
       while (x < tr.x) {
         while (y < bl.y) {
           const center = projection.fromDivPixelToLatLng(
-              new google.maps.Point(x + this.gridSize, y + this.gridSize)
+            new google.maps.Point(x + this.gridSize, y + this.gridSize)
           );
           if (extendedBounds.contains(center)) {
             this.clusters.push(new MarkerCluster(this.map, center));
@@ -480,7 +480,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
         x += 2 * this.gridSize;
       }
 
-      const firstIndex = this.indexLowerBoundLng_(extendedBounds.getSouthWest().lng());
+      const firstIndex = this.indexLowerBoundLng(extendedBounds.getSouthWest().lng());
       for (let i = firstIndex, l = this.markers.length; i < l; ++i) {
         const marker = this.markers[i];
         if ((marker.getPosition()?.lng() ?? 0) > extendedBounds.getNorthEast().lng()) {
@@ -505,33 +505,33 @@ export class MarkerClusterer extends google.maps.OverlayView {
     }
   }
 
-  private init_(): void {
-    this.setupStyles_();
+  private init(): void {
+    this.setupStyles();
     if (this.pMap) {
       google.maps.event.addListenerOnce(this.pMap, 'tilesLoadedFirst', () => {
         this.pTilesReady = true;
         if (this.pReady) {
-          this.setReady_(this.pReady);
+          this.setReady(this.pReady);
         }
       });
       this.setMap(this.pMap);
     }
   }
 
-  private setupStyles_(): void {
+  private setupStyles(): void {
     if (this.pStyles.length) {
       return;
     }
     SIZES.forEach((size, i) => {
       this.pStyles.push({
         height: size,
-        url: this.pImagePath + (i + 1) + '.' + this.pImageExtension,
+        url: `${this.pImagePath}${(i + 1)}.${this.pImageExtension}`,
         width: size,
       });
     });
   }
 
-  private calculator_(markers: google.maps.Marker[], numStyles: number): ISums {
+  private calculatorDef(markers: google.maps.Marker[], numStyles: number): ISums {
     let index = 0;
     let dv = markers.length;
     while (dv !== 0) {
@@ -546,7 +546,7 @@ export class MarkerClusterer extends google.maps.OverlayView {
     };
   }
 
-  private removeEventListeners_(): void {
+  private removeEventListeners(): void {
     this.pZoomChangedListener?.remove();
     this.pIdleListener?.remove();
   }

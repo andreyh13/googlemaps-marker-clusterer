@@ -19,10 +19,10 @@ export class Builder {
   private pStyles: IStyle[] = [];
   private pImagePath: string = MARKER_CLUSTER_IMAGE_PATH_DEFAULT;
   private pImageExtension: string = MARKER_CLUSTER_IMAGE_EXTENSION;
-  private pZoomOnClick: boolean = true;
-  private pAverageCenter: boolean = true;
-  private pGridBasedStrategy: boolean = false;
-  private pGridGlobal: boolean = false;
+  private pZoomOnClick = true;
+  private pAverageCenter = true;
+  private pGridBasedStrategy = false;
+  private pGridGlobal = false;
 
   constructor(map: google.maps.Map) {
     this.pMap = map;
@@ -89,51 +89,51 @@ export class Builder {
     return clusterer;
   }
 
-  get map() {
+  get map(): google.maps.Map {
     return this.pMap;
   }
 
-  get gridSize() {
+  get gridSize(): number {
     return this.pGridSize ?? GRID_SIZE_DEFAULT;
   }
 
-  get minClusterSize() {
+  get minClusterSize(): number {
     return this.pMinClusterSize ?? MIN_CLUSTER_SIZE_DEFAULT;
   }
 
-  get maxZoom() {
+  get maxZoom(): number {
     return this.pMaxZoom ?? MAX_ZOOM_DEFAULT;
   }
 
-  get className() {
+  get className(): string {
     return this.pClassName ?? CLASS_NAME_DEFAULT;
   }
 
-  get styles() {
+  get styles(): IStyle[] {
     return this.pStyles ?? [];
   }
 
-  get imagePath() {
+  get imagePath(): string {
     return this.pImagePath ?? MARKER_CLUSTER_IMAGE_PATH_DEFAULT;
   }
 
-  get imageExtension() {
+  get imageExtension(): string {
     return this.pImageExtension ?? MARKER_CLUSTER_IMAGE_EXTENSION;
   }
 
-  get zoomOnClick() {
+  get zoomOnClick(): boolean {
     return this.pZoomOnClick ?? true;
   }
 
-  get averageCenter() {
+  get averageCenter(): boolean {
     return this.pAverageCenter ?? true;
   }
 
-  get gridBasedStrategy() {
+  get gridBasedStrategy(): boolean {
     return this.pGridBasedStrategy ?? false;
   }
 
-  get gridGlobal() {
+  get gridGlobal(): boolean {
     return this.pGridGlobal ?? false;
   }
 }

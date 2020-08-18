@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es5",
     "module": "commonjs",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "declaration": true,
     "outDir": "./lib",
     "noImplicitAny": true,
@@ -9,7 +13,14 @@
     "jsx": "react",
     "allowJs": true,
     "sourceMap": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/__tests__/*"
+  ]
 }

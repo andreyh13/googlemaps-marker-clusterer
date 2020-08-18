@@ -2,21 +2,22 @@ import { MarkerClusterer } from './clusterer';
 import { CLASS_NAME_DEFAULT } from './constants';
 import { ClustererHelper } from './helper';
 import { IStyle, ISums } from './interfaces';
+import { MarkerCluster } from './cluster';
 
 export class MarkerClusterIcon extends google.maps.OverlayView {
   private id: number;
   private map: google.maps.Map | null = null;
   private div: HTMLDivElement | null = null;
-  private visible: boolean = false;
+  private visible = false;
   private center: google.maps.LatLng | null = null;
   private sums: ISums | null = null;
-  private width: number = 0;
-  private height: number = 0;
-  private url: string = '';
-  private backgroundPosition: string = '0 0';
+  private width = 0;
+  private height = 0;
+  private url = '';
+  private backgroundPosition = '0 0';
   private anchor: number[] | null = null;
-  private textColor: string = 'black';
-  private textSize: number = 11;
+  private textColor = 'black';
+  private textSize = 11;
 
   constructor(map: google.maps.Map, id: number) {
     super();
@@ -30,10 +31,10 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     if (this.div) {
       this.div.innerHTML = value.text;
     }
-    this.useStyle_();
+    this.useStyle();
   }
 
-  public setCenter(value: google.maps.LatLng) {
+  public setCenter(value: google.maps.LatLng): void {
     this.center = value;
   }
 
@@ -46,8 +47,8 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
 
   public show(): void {
     if (this.div && this.center) {
-      const pos = this.getPosFromLatLng_(this.center);
-      this.div.style.cssText = this.createCss_(pos);
+      const pos = this.getPosFromLatLng(this.center);
+      this.div.style.cssText = this.createCss(pos);
       this.div.style.display = '';
     }
     this.visible = true;
@@ -63,21 +64,21 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
   public onAdd(): void {
     this.div = document.createElement('DIV') as HTMLDivElement;
     if (this.visible && this.center) {
-      const pos = this.getPosFromLatLng_(this.center);
-      this.div.style.cssText = this.createCss_(pos);
+      const pos = this.getPosFromLatLng(this.center);
+      this.div.style.cssText = this.createCss(pos);
       this.div.innerHTML = this.text;
       this.div.className = this.className + ' ' + this.classId;
     }
     const panes = this.getPanes();
     panes.overlayMouseTarget.appendChild(this.div);
-    google.maps.event.addDomListener(this.div, 'click', () => this.triggerClusterClick_());
+    google.maps.event.addDomListener(this.div, 'click', () => this.triggerClusterClick());
   }
 
   public draw(): void {
     if (this.visible && this.center && this.div) {
-      const pos = this.getPosFromLatLng_(this.center);
-      this.div.style.top = pos.y + 'px';
-      this.div.style.left = pos.x + 'px';
+      const pos = this.getPosFromLatLng(this.center);
+      this.div.style.top = `${pos.y}px`;
+      this.div.style.left = `${pos.x}px`;
     }
   }
 
@@ -92,7 +93,7 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
   }
   /* ----End: google.maps.OverlayView interface methods ---- */
 
-  private triggerClusterClick_() {
+  private triggerClusterClick() {
     if (this.clusterer?.isZoomOnClick && this.cluster && this.getMap()) {
       if (this.getMap() instanceof google.maps.Map) {
         (this.getMap() as google.maps.Map).fitBounds(this.cluster.getBounds(), 5);
@@ -100,14 +101,14 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     }
   }
 
-  private getPosFromLatLng_(latLng: google.maps.LatLng) {
+  private getPosFromLatLng(latLng: google.maps.LatLng) {
     const pos = this.getProjection().fromLatLngToDivPixel(latLng);
     pos.x -= Math.floor(this.width / 2);
     pos.y -= Math.floor(this.height / 2);
     return pos;
   }
 
-  private createCss_(pos: google.maps.Point): string {
+  private createCss(pos: google.maps.Point): string {
     const style = [
       `background-image:url(${this.url});`,
       `background-size: contain;`,
@@ -134,7 +135,7 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     return style.join('');
   }
 
-  private useStyle_(): void {
+  private useStyle(): void {
     let index = Math.max(0, this.index - 1);
     if (this.styles?.length) {
       index = Math.min(this.styles.length - 1, index);
@@ -161,7 +162,7 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     return (this.map && ClustererHelper.getClusterer(this.map)) ?? undefined;
   }
 
-  get cluster() {
+  get cluster(): MarkerCluster | undefined {
     return this.clusterer?.clusters.find(cluster => cluster.getId() === this.id);
   }
 
@@ -181,18 +182,18 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     return this.sums?.index ?? 0;
   }
 
-  get hasAnchor() {
+  get hasAnchor(): boolean {
     return this.anchor !== null && this.anchor.length > 1;
   }
 
-  get anchorH() {
+  get anchorH(): number {
     if (this.hasAnchor) {
       return this.anchor?.[0] ?? 0;
     }
     return 0;
   }
 
-  get anchorW() {
+  get anchorW(): number {
     if (this.hasAnchor) {
       return this.anchor?.[1] ?? 0;
     }

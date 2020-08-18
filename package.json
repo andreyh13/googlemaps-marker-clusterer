@@ -1,14 +1,15 @@
 {
   "name": "googlemaps-marker-clusterer",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Clusterer library for Google Maps JavaScript API v3 markers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
-    "build": "webpack",
+    "build": "webpack --mode production",
+    "builddev": "webpack --mode development",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
+    "lint": "eslint . --ext .ts",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
@@ -25,29 +26,46 @@
     "markers"
   ],
   "author": "Andriy Khomenko",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/andreyh13/googlemaps-marker-clusterer/issues"
   },
   "homepage": "https://github.com/andreyh13/googlemaps-marker-clusterer#readme",
   "devDependencies": {
-    "@types/jest": "^25.2.1",
+    "@babel/core": "^7.11.1",
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/jest": "^26.0.3",
+    "@typescript-eslint/eslint-plugin": "^3.4.0",
+    "@typescript-eslint/parser": "^3.4.0",
+    "babel-loader": "^8.1.0",
     "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^5.1.1",
-    "jest": "^25.4.0",
+    "copy-webpack-plugin": "^6.0.2",
+    "eslint": "^7.3.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jsdoc": "^28.5.1",
+    "eslint-plugin-prefer-arrow": "^1.2.1",
+    "file-loader": "^6.0.0",
+    "jest": "^26.1.0",
     "prettier": "^2.0.5",
-    "ts-jest": "^25.4.0",
-    "ts-loader": "^7.0.1",
-    "tslint": "^6.1.2",
-    "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.8.3",
+    "ts-jest": "^26.1.1",
+    "ts-loader": "^7.0.5",
+    "tslint-to-eslint-config": "^1.0.0",
+    "typescript": "^3.9.5",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
+    "@babel/runtime": "^7.11.2",
     "@types/googlemaps": "^3.39.3"
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  }
 }

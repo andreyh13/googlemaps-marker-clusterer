@@ -11,7 +11,7 @@ export class ClustererHelper {
     return false;
   }
 
-  public static getClusterer(map: google.maps.Map) {
+  public static getClusterer(map: google.maps.Map): MarkerClusterer | undefined {
     if (instances.has(map)) {
       return instances.get(map);
     }

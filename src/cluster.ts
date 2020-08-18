@@ -16,7 +16,7 @@ export class MarkerCluster {
     this.map = map;
     this.center = center;
     this.id = ++MarkerCluster.counter;
-    this.calculateBounds_();
+    this.calculateBounds();
     this.icon = new MarkerClusterIcon(map, this.id);
   }
 
@@ -75,20 +75,20 @@ export class MarkerCluster {
   }
 
   public addMarker(marker: google.maps.Marker): boolean {
-    if (this.isFeatureAlreadyAdded_(marker)) {
+    if (this.isFeatureAlreadyAdded(marker)) {
       return false;
     }
     marker.set('clusterID', this.classId);
     this.markers.push(marker);
-    this.updateClusterCenter_(marker);
+    this.updateClusterCenter(marker);
     if (this.markers.length < this.minClusterSize) {
-      this.hideInCluster_(marker);
+      this.hideInCluster(marker);
     } else if (this.markers.length === this.minClusterSize) {
       for (const m of this.markers) {
-        this.showInCluster_(m);
+        this.showInCluster(m);
       }
     } else {
-      this.showInCluster_(marker);
+      this.showInCluster(marker);
     }
     this.updateIcon();
     return true;
@@ -109,7 +109,7 @@ export class MarkerCluster {
     if (mz && zoom > mz) {
       // The zoom is greater than our max zoom so show all the features of cluster.
       for (const m of this.markers) {
-        this.hideInCluster_(m);
+        this.hideInCluster(m);
       }
       return;
     }
@@ -134,11 +134,11 @@ export class MarkerCluster {
     return this.id;
   }
 
-  private isFeatureAlreadyAdded_(marker: google.maps.Marker) {
+  private isFeatureAlreadyAdded(marker: google.maps.Marker) {
     return this.markers.indexOf(marker) !== -1;
   }
 
-  private hideInCluster_(marker: google.maps.Marker): void {
+  private hideInCluster(marker: google.maps.Marker): void {
     if (!marker.getVisible()) {
       marker.setMap(null);
     } else {
@@ -146,26 +146,26 @@ export class MarkerCluster {
     }
   }
 
-  private showInCluster_(marker: google.maps.Marker): void {
+  private showInCluster(marker: google.maps.Marker): void {
     marker.setMap(null);
   }
 
-  private updateClusterCenter_(marker: google.maps.Marker): void {
+  private updateClusterCenter(marker: google.maps.Marker): void {
     if (!this.center) {
       this.center = marker.getPosition() ?? null;
-      this.calculateBounds_();
+      this.calculateBounds();
     } else {
       if (this.isAverageCenter) {
         const l = this.markers.length + 1;
         const lat = (this.center.lat() * (l - 1) + (marker.getPosition()?.lat() ?? this.center.lat())) / l;
         const lng = (this.center.lng() * (l - 1) + (marker.getPosition()?.lng() ?? this.center.lng())) / l;
         this.center = new google.maps.LatLng(lat, lng);
-        this.calculateBounds_();
+        this.calculateBounds();
       }
     }
   }
 
-  private calculateBounds_(): void {
+  private calculateBounds(): void {
     const mBounds = new google.maps.LatLngBounds();
     if (this.center) {
       mBounds.extend(this.center);
