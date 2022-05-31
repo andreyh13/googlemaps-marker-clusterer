@@ -1,6 +1,6 @@
 {
   "name": "googlemaps-points-clusterer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Clusterer library for Google Maps JavaScript API v3 markers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
