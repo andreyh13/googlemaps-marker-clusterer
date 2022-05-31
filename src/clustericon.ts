@@ -71,7 +71,7 @@ export class MarkerClusterIcon extends google.maps.OverlayView {
     }
     const panes = this.getPanes();
     panes.overlayMouseTarget.appendChild(this.div);
-    google.maps.event.addDomListener(this.div, 'click', () => this.triggerClusterClick());
+    this.div.addEventListener('click', () => this.triggerClusterClick(), true);
   }
 
   public draw(): void {

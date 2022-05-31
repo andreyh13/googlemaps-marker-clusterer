@@ -98,7 +98,6 @@ export class MarkerCluster {
     this.icon?.remove();
     this.icon = null;
     this.markers = [];
-    delete this.markers;
     this.map = null;
     this.center = null;
   }

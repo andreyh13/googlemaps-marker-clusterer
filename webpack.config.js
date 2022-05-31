@@ -14,7 +14,7 @@ module.exports = {
       {
         test: /\.tsx?$/,
         exclude: /node_modules/,
-        loaders: ['babel-loader', 'ts-loader']
+        use: ['babel-loader', 'ts-loader']
       },
       {
         test: /\.(png|svg|jpg|gif)$/,

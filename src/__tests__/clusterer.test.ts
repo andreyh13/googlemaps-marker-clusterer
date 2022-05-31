@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { setupGoogleMapsAPIMock } from '../aux/mockgooglemapsapi';
 import { Loader } from '../index';
 
