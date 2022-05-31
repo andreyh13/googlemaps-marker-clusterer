@@ -299,12 +299,12 @@ export class MarkerClusterer extends google.maps.OverlayView {
 
   private setReady(ready: boolean): void {
     this.pReady = ready;
-    if (ready) {
-      if (this.hasMarkers && this.pFirstIdle && this.pTilesReady) {
+    if (ready && this.pFirstIdle && this.pTilesReady) {
+      if (this.hasMarkers) {
         this.createClusters();
-        this.pFirstIdle = false;
         this.pReadyForFiltering = true;
       }
+      this.pFirstIdle = false;
     }
   }
 
@@ -493,14 +493,20 @@ export class MarkerClusterer extends google.maps.OverlayView {
   private init(): void {
     this.setupStyles();
     if (this.pMap) {
-      google.maps.event.addListenerOnce(this.pMap, 'tilesLoadedFirst', () => {
-        this.pTilesReady = true;
-        if (this.pReady) {
-          this.setReady(this.pReady);
-        }
-      });
+      this.tilesLoadedFirstListener(this.pMap);
       this.setMap(this.pMap);
     }
+  }
+
+  private tilesLoadedFirstListener(map: google.maps.Map) {
+    google.maps.event.addListenerOnce(this.pMap, 'tilesLoadedFirst', () => {
+      this.pTilesReady = true;
+      if (this.pReady) {
+        this.setReady(this.pReady);
+      } else {
+        this.tilesLoadedFirstListener(map);
+      }
+    });
   }
 
   private setupStyles(): void {
